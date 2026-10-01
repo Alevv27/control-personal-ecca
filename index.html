@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Control de Personal ECCa</title>
+<style>
+:root{--bg:#f4f7f8;--card:#fff;--ink:#17232b;--muted:#6a7b86;--line:#dfe7eb;--brand:#075a71;--brand2:#148299;--soft:#eaf4f6;--ok:#287a57;--warn:#9a6500;--bad:#a94444}
+*{box-sizing:border-box}
+body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+button,input,select{font:inherit}
+.app{display:grid;grid-template-columns:245px minmax(0,1fr);min-height:100vh}
+aside{background:#084f62;color:#fff;padding:22px 16px;display:flex;flex-direction:column}
+.brand{display:flex;gap:11px;align-items:center;padding:0 8px 19px;border-bottom:1px solid #ffffff2b}
+.logo{width:42px;height:42px;border-radius:11px;background:#fff;color:var(--brand);display:grid;place-items:center;font-weight:800}
+.brand strong{display:block;font-size:20px}.brand span{display:block;font-size:11px;opacity:.8;margin-top:3px}
+nav{display:grid;gap:5px;margin-top:20px}
+nav button{border:0;background:transparent;color:#fff;text-align:left;padding:12px;border-radius:10px;cursor:pointer}
+nav button.active,nav button:hover{background:#ffffff24}
+.sidefoot{margin-top:auto;font-size:11px;opacity:.8;padding:8px}
+main{min-width:0;padding:24px 28px 40px}
+header{display:flex;justify-content:space-between;gap:15px;align-items:flex-start;margin-bottom:16px}
+h1{margin:0;font-size:28px}
+.eyebrow{margin:0 0 4px;color:var(--muted);font-size:11px;text-transform:uppercase;font-weight:700}
+.sub{margin:5px 0 0;color:var(--muted);font-size:13px}
+.actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.badge{background:#eef7f4;color:#256b50;border:1px solid #cfe8dd;padding:7px 10px;border-radius:999px;font-size:11px;font-weight:700}
+.badge.off{background:#fff6df;color:#8b5c00;border-color:#efdcad}
+.btn{border:0;border-radius:9px;padding:10px 13px;font-weight:700;cursor:pointer}
+.primary{background:var(--brand);color:#fff}.secondary{background:#fff;border:1px solid var(--line)}.light{align-self:end;background:#eef3f5}
+.statusbar{display:none;margin-bottom:14px;padding:12px 14px;border-radius:11px;border:1px solid var(--line);background:#fff;font-size:12px}
+.statusbar.show{display:block}.statusbar.error{border-color:#f1caca;background:#fff7f7;color:#8d3131}.statusbar.ok{border-color:#cce7dd;background:#f5fbf8;color:#26684f}
+.filters{display:grid;grid-template-columns:1.4fr 1fr 1fr .85fr .85fr auto;gap:9px;background:#fff;border:1px solid var(--line);padding:13px;border-radius:14px;margin-bottom:14px}
+label{font-size:10px;color:var(--muted);text-transform:uppercase;font-weight:700}
+input,select{width:100%;border:1px solid #ccd8de;border-radius:8px;padding:9px 10px;background:#fff;margin-top:5px}
+.view{display:none}.view.active{display:block}
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:14px}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:15px;box-shadow:0 6px 18px #20343d0b}
+.kpi span{display:block;font-size:10px;color:var(--muted);text-transform:uppercase;font-weight:700}
+.kpi strong{display:block;font-size:25px;margin:7px 0 3px}.kpi small{font-size:10px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:1.3fr 1fr;gap:14px;margin-bottom:14px}
+h2{margin:0;font-size:16px}.hint{font-size:11px;color:var(--muted);margin:4px 0 0}
+.bars{display:grid;gap:12px;margin-top:15px}
+.barrow{display:grid;grid-template-columns:170px 1fr 58px;gap:9px;align-items:center;font-size:12px}
+.track{height:10px;background:#edf2f4;border-radius:999px;overflow:hidden}.fill{height:100%;background:var(--brand2);border-radius:999px}
+.val{text-align:right;font-weight:700}
+.donutwrap{display:flex;align-items:center;gap:20px;min-height:185px}.donut{width:150px;height:150px;border-radius:50%;position:relative;background:#edf2f4}
+.donut:after{content:"";position:absolute;inset:28px;background:#fff;border-radius:50%}
+.donutcenter{position:absolute;inset:0;display:grid;place-content:center;text-align:center;z-index:2}
+.donutcenter strong{font-size:23px}.donutcenter span{font-size:10px;color:var(--muted)}.legend{display:grid;gap:8px;font-size:11px}
+.legendrow{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center}.dot{width:9px;height:9px;border-radius:50%}
+table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:9px 8px;border-bottom:1px solid #edf1f3;text-align:left;white-space:nowrap}
+th{font-size:10px;color:var(--muted);text-transform:uppercase}tbody tr{cursor:pointer}tbody tr:hover{background:#f7fafb}.scroll{overflow:auto}
+.pill{padding:4px 8px;border-radius:999px;background:#eef3f5;color:#5c6e79;font-size:10px;font-weight:700}
+.people{display:grid;grid-template-columns:310px 1fr;gap:14px}.plist{display:grid;gap:7px;max-height:650px;overflow:auto;margin-top:12px}
+.person{border:1px solid var(--line);background:#fff;border-radius:10px;padding:10px;text-align:left;cursor:pointer}
+.person.active,.person:hover{background:var(--soft);border-color:#9fc8d1}.person strong{display:block;font-size:12px}.person span{font-size:10px;color:var(--muted)}
+.profilehead{display:flex;gap:12px;align-items:center;padding-bottom:14px;border-bottom:1px solid var(--line)}.avatar{width:50px;height:50px;border-radius:50%;background:var(--soft);color:var(--brand);display:grid;place-items:center;font-weight:800}
+.profilehead p{margin:4px 0 0;color:var(--muted);font-size:11px}.pkpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0}.pk{background:#f7fafb;padding:11px;border-radius:10px;text-align:center}
+.pk strong{display:block;font-size:18px}.pk span{font-size:9px;color:var(--muted)}.empty{padding:25px;color:var(--muted);font-size:12px;text-align:center}
+.drawerbg{position:fixed;inset:0;background:#10242c55;z-index:20;display:none}.drawerbg.show{display:block}
+.drawer{position:fixed;top:0;right:0;width:min(430px,92vw);height:100vh;background:#fff;z-index:21;padding:20px;transform:translateX(100%);transition:.2s;box-shadow:-12px 0 34px #0002;overflow:auto}
+.drawer.show{transform:translateX(0)}.dhead{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid var(--line);padding-bottom:12px}
+.x{border:1px solid var(--line);background:#fff;border-radius:8px;width:36px;height:36px;font-size:22px}.drow{display:grid;grid-template-columns:125px 1fr;gap:10px;padding:10px 0;border-bottom:1px solid #edf1f3;font-size:12px}
+.drow span{color:var(--muted)}
+@media(max-width:1150px){.kpis{grid-template-columns:repeat(3,1fr)}.filters{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:850px){.app{grid-template-columns:1fr}aside{display:none}.grid,.people{grid-template-columns:1fr}.filters{grid-template-columns:repeat(2,1fr)}main{padding:16px}}
+@media(max-width:560px){header{flex-direction:column}.kpis{grid-template-columns:repeat(2,1fr)}.filters{grid-template-columns:1fr}.barrow{grid-template-columns:115px 1fr 50px}.donutwrap{flex-direction:column;align-items:flex-start}.pkpis{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside>
+  <div class="brand"><div class="logo">EC</div><div><strong>SEDAPAL</strong><span>Equipo Comercial Callao</span></div></div>
+  <nav id="nav">
+    <button class="active" data-view="resumen">Resumen ejecutivo</button>
+    <button data-view="ausentismos">Ausentismos</button>
+    <button data-view="personal">Seguimiento individual</button>
+  </nav>
+  <div class="sidefoot">Fuente oficial: CONTROL_PERSONAL_ECCA</div>
+</aside>
+
+<main>
+<header>
+  <div>
+    <p class="eyebrow">Evaluación, Seguimiento y Control</p>
+    <h1>Control de Personal ECCa</h1>
+    <p class="sub">Dashboard conectado a SharePoint mediante Microsoft Graph</p>
+  </div>
+  <div class="actions">
+    <span id="connBadge" class="badge off">No conectado</span>
+    <button id="loginBtn" class="btn primary">Iniciar sesión</button>
+    <button id="refreshBtn" class="btn secondary" disabled>Actualizar datos</button>
+    <button id="logoutBtn" class="btn secondary" style="display:none">Cerrar sesión</button>
+  </div>
+</header>
+
+<div id="statusbar" class="statusbar"></div>
+
+<section class="filters">
+  <label>Buscar<input id="q" placeholder="Trabajador, ficha o boleta"></label>
+  <label>Tipo<select id="type"><option value="">Todos</option></select></label>
+  <label>Estado<select id="status"><option value="">Todos</option></select></label>
+  <label>Desde<input id="from" type="date"></label>
+  <label>Hasta<input id="to" type="date"></label>
+  <button id="clear" class="btn light">Limpiar</button>
+</section>
+
+<section id="resumen" class="view active">
+<div class="kpis">
+  <div class="card kpi"><span>Total registros</span><strong id="kt">0</strong><small>Movimientos almacenados</small></div>
+  <div class="card kpi"><span>Horas ausentismo</span><strong id="kh">0 h</strong><small>Período filtrado</small></div>
+  <div class="card kpi"><span>Trabajadores</span><strong id="kw">0</strong><small>Personas con registros</small></div>
+  <div class="card kpi"><span>Comisión servicios</span><strong id="kc">0</strong><small>Movimientos</small></div>
+  <div class="card kpi"><span>Atención médica</span><strong id="km">0</strong><small>Movimientos</small></div>
+  <div class="card kpi"><span>Permiso personal</span><strong id="kp">0</strong><small>Movimientos</small></div>
+</div>
+
+<div class="grid">
+  <div class="card"><h2>Horas por tipo de movimiento</h2><p class="hint">Distribución acumulada</p><div id="typeBars" class="bars"></div></div>
+  <div class="card"><h2>Distribución de registros</h2><p class="hint">Participación por motivo</p><div class="donutwrap"><div id="donut" class="donut"><div class="donutcenter"><strong id="dt">0</strong><span>registros</span></div></div><div id="legend" class="legend"></div></div></div>
+</div>
+
+<div class="grid">
+  <div class="card"><h2>Trabajadores con más horas</h2><p class="hint">Ranking acumulado</p><div id="workerBars" class="bars"></div></div>
+  <div class="card"><h2>Estado de registros</h2><p class="hint">Estado SAP</p><div id="stateBox" class="bars"></div></div>
+</div>
+
+<div class="card"><h2>Últimos movimientos</h2><p class="hint">Registros más recientes</p><div class="scroll"><table><thead><tr><th>Boleta</th><th>Ficha</th><th>Trabajador</th><th>Fecha</th><th>Horario</th><th>Horas</th><th>Tipo</th><th>Estado</th></tr></thead><tbody id="recent"></tbody></table></div></div>
+</section>
+
+<section id="ausentismos" class="view">
+<div class="card"><h2>Listado de ausentismos</h2><p id="count" class="hint">0 registros</p><div class="scroll"><table><thead><tr><th>Clave</th><th>Boleta</th><th>Ficha</th><th>Trabajador</th><th>Fecha</th><th>Inicio</th><th>Fin</th><th>Horas</th><th>Tipo</th><th>Estado</th></tr></thead><tbody id="all"></tbody></table></div></div>
+</section>
+
+<section id="personal" class="view">
+<div class="people">
+  <div class="card"><h2>Personal</h2><p class="hint">Seleccione un trabajador</p><div id="plist" class="plist"></div></div>
+  <div class="card"><div id="profile" class="empty">Inicie sesión y cargue los datos de SharePoint.</div></div>
+</div>
+</section>
+</main>
+</div>
+
+<div id="dbg" class="drawerbg"></div>
+<aside id="drawer" class="drawer">
+  <div class="dhead"><div><p class="eyebrow">Detalle del movimiento</p><h2 id="dtitle">Registro</h2></div><button id="dx" class="x">×</button></div>
+  <div id="dbody"></div>
+</aside>
+
+<script type="module">
+import { PublicClientApplication, InteractionRequiredAuthError } from "https://cdn.jsdelivr.net/npm/@azure/msal-browser@5/+esm";
+
+const CONFIG = {
+  clientId: "6b135e30-d618-4ef6-88c1-3d1269c67177",
+  tenantId: "042d70d5-3f23-4473-b9e8-d16b8401d5fc",
+  sharePointHostname: "sedapalcompe.sharepoint.com",
+  sitePath: "/sites/EC-CA/ESC",
+  listId: "1dc69311-8263-42a0-aa5a-499893b8e4d1",
+  listTitle: "CONTROL_PERSONAL_ECCA"
+};
+
+const redirectUri = window.location.protocol === "file:" ? "http://localhost" : window.location.origin;
+
+const msalInstance = new PublicClientApplication({
+  auth: {
+    clientId: CONFIG.clientId,
+    authority: `https://login.microsoftonline.com/${CONFIG.tenantId}`,
+    redirectUri
+  },
+  cache: {
+    cacheLocation: "sessionStorage",
+    storeAuthStateInCookie: false
+  }
+});
+
+await msalInstance.initialize();
+
+const SCOPES = ["Sites.Read.All"];
+let DATA = [];
+let filtered = [];
+let selected = null;
+
+const $ = id => document.getElementById(id);
+const norm = v => String(v ?? "").toLocaleLowerCase("es");
+const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fd = d => {
+  if (!d) return "";
+  const iso = String(d).slice(0,10);
+  const p = iso.split("-");
+  return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : d;
+};
+const sum = (a,f) => a.reduce((s,x)=>s+(Number(f(x))||0),0);
+const stat = v => v && String(v).trim() ? v : "Sin estado";
+
+function setStatus(message, type="") {
+  const el = $("statusbar");
+  if (!message) {
+    el.className = "statusbar";
+    el.textContent = "";
+    return;
+  }
+  el.textContent = message;
+  el.className = `statusbar show ${type}`;
+}
+
+function setConnected(account) {
+  const connected = !!account;
+  $("connBadge").textContent = connected ? (account.username || "Conectado") : "No conectado";
+  $("connBadge").className = `badge ${connected ? "" : "off"}`;
+  $("loginBtn").style.display = connected ? "none" : "";
+  $("logoutBtn").style.display = connected ? "" : "none";
+  $("refreshBtn").disabled = !connected;
+}
+
+async function getAccount() {
+  const accounts = msalInstance.getAllAccounts();
+  return accounts[0] || null;
+}
+
+async function signIn() {
+  try {
+    setStatus("Abriendo inicio de sesión de Microsoft…");
+    const result = await msalInstance.loginPopup({ scopes: SCOPES, prompt: "select_account" });
+    msalInstance.setActiveAccount(result.account);
+    setConnected(result.account);
+    setStatus("Sesión iniciada. Cargando datos reales de SharePoint…", "ok");
+    await loadSharePointData();
+  } catch (err) {
+    console.error(err);
+    setStatus(authErrorMessage(err), "error");
+  }
+}
+
+async function signOut() {
+  const account = msalInstance.getActiveAccount() || await getAccount();
+  DATA = []; filtered = []; render(); setConnected(null);
+  if (account) {
+    await msalInstance.logoutPopup({ account, postLogoutRedirectUri: redirectUri });
+  }
+}
+
+function authErrorMessage(err) {
+  const text = String(err?.message || err || "");
+  if (text.includes("AADSTS65001") || text.toLowerCase().includes("consent")) {
+    return "Microsoft Entra solicita consentimiento para Sites.Read.All. Un administrador de SEDAPAL puede tener que aprobar el permiso.";
+  }
+  if (text.includes("redirect_uri") || text.includes("AADSTS50011")) {
+    return `La URL actual (${redirectUri}) no está registrada como URI de redirección SPA en Microsoft Entra. Agrégala en Autenticación.`;
+  }
+  return "No se pudo iniciar sesión: " + text;
+}
+
+async function getAccessToken() {
+  let account = msalInstance.getActiveAccount() || await getAccount();
+  if (!account) throw new Error("No existe una sesión iniciada.");
+  msalInstance.setActiveAccount(account);
+
+  try {
+    const res = await msalInstance.acquireTokenSilent({ scopes: SCOPES, account });
+    return res.accessToken;
+  } catch (err) {
+    if (err instanceof InteractionRequiredAuthError) {
+      const res = await msalInstance.acquireTokenPopup({ scopes: SCOPES, account });
+      return res.accessToken;
+    }
+    throw err;
+  }
+}
+
+async function graphFetch(url, token) {
+  const res = await fetch(url, {
+    headers: { Authorization: `Bearer ${token}`, Accept: "application/json" }
+  });
+  const text = await res.text();
+  let body = null;
+  try { body = text ? JSON.parse(text) : null; } catch { body = text; }
+  if (!res.ok) {
+    const msg = body?.error?.message || body?.error_description || text || `HTTP ${res.status}`;
+    const error = new Error(msg);
+    error.status = res.status;
+    throw error;
+  }
+  return body;
+}
+
+async function resolveSiteId(token) {
+  const url = `https://graph.microsoft.com/v1.0/sites/${CONFIG.sharePointHostname}:${CONFIG.sitePath}?$select=id,displayName,webUrl`;
+  const site = await graphFetch(url, token);
+  return site.id;
+}
+
+async function readAllItems(siteId, token) {
+  let url = `https://graph.microsoft.com/v1.0/sites/${encodeURIComponent(siteId)}/lists/${CONFIG.listId}/items?$expand=fields&$top=999`;
+  const items = [];
+  while (url) {
+    const page = await graphFetch(url, token);
+    items.push(...(page.value || []));
+    url = page["@odata.nextLink"] || null;
+  }
+  return items;
+}
+
+function pick(fields, ...names) {
+  for (const name of names) {
+    if (fields[name] !== undefined && fields[name] !== null) return fields[name];
+  }
+  return "";
+}
+
+function mapItem(item) {
+  const f = item.fields || {};
+  return {
+    ClaveRegistro: String(pick(f, "ClaveRegistro", "Title") || ""),
+    NroBoletaSAP: String(pick(f, "NroBoletaSAP") || ""),
+    Ficha: String(pick(f, "Ficha") || ""),
+    Trabajador: String(pick(f, "Trabajador") || ""),
+    Fecha: String(pick(f, "Fecha") || "").slice(0,10),
+    HoraInicio: String(pick(f, "HoraInicio") || ""),
+    HoraFin: String(pick(f, "HoraFin") || ""),
+    Horas: Number(String(pick(f, "Horas") || "0").replace(",", ".")) || 0,
+    TipoMovimiento: String(pick(f, "TipoMovimiento") || ""),
+    EstadoSAP: String(pick(f, "EstadoSAP") || ""),
+    _sharePointItemId: item.id
+  };
+}
+
+async function loadSharePointData() {
+  try {
+    $("refreshBtn").disabled = true;
+    setStatus("Consultando CONTROL_PERSONAL_ECCA en SharePoint…");
+    const token = await getAccessToken();
+    const siteId = await resolveSiteId(token);
+    const items = await readAllItems(siteId, token);
+    DATA = items.map(mapItem).filter(x =>
+      x.ClaveRegistro || x.NroBoletaSAP || x.Ficha || x.Trabajador || x.TipoMovimiento
+    );
+    filtered = [...DATA];
+    populateFilters();
+    render();
+    const account = msalInstance.getActiveAccount() || await getAccount();
+    setConnected(account);
+    setStatus(`Conexión correcta. Se cargaron ${DATA.length} registros reales desde ${CONFIG.listTitle}.`, "ok");
+  } catch (err) {
+    console.error(err);
+    if (err.status === 403) {
+      setStatus("SharePoint respondió 403. Verifica que Sites.Read.All tenga consentimiento y que tu cuenta tenga acceso al sitio Evaluación, Seguimiento y Control.", "error");
+    } else if (err.status === 404) {
+      setStatus("No se encontró el sitio o la lista. Verifica la URL del sitio y el identificador de CONTROL_PERSONAL_ECCA.", "error");
+    } else {
+      setStatus("No se pudieron cargar los datos reales: " + (err?.message || err), "error");
+    }
+  } finally {
+    $("refreshBtn").disabled = !(await getAccount());
+  }
+}
+
+function populateFilters() {
+  const currentType = $("type").value;
+  const currentStatus = $("status").value;
+  const types = [...new Set(DATA.map(x=>x.TipoMovimiento).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"es"));
+  const states = [...new Set(DATA.map(x=>stat(x.EstadoSAP)))].sort((a,b)=>a.localeCompare(b,"es"));
+  $("type").innerHTML = '<option value="">Todos</option>' + types.map(x=>`<option>${esc(x)}</option>`).join("");
+  $("status").innerHTML = '<option value="">Todos</option>' + states.map(x=>`<option>${esc(x)}</option>`).join("");
+  if (types.includes(currentType)) $("type").value = currentType;
+  if (states.includes(currentStatus)) $("status").value = currentStatus;
+
+  const dates = DATA.map(x=>x.Fecha).filter(Boolean).sort();
+  if (dates.length && !$("from").value && !$("to").value) {
+    $("from").value = dates[0];
+    $("to").value = dates.at(-1);
+  }
+}
+
+function apply() {
+  const q=norm($("q").value),t=$("type").value,s=$("status").value,f=$("from").value,to=$("to").value;
+  filtered=DATA.filter(x=>
+    (!q||norm(`${x.Trabajador} ${x.Ficha} ${x.NroBoletaSAP} ${x.ClaveRegistro}`).includes(q)) &&
+    (!t||x.TipoMovimiento===t) &&
+    (!s||stat(x.EstadoSAP)===s) &&
+    (!f||!x.Fecha||x.Fecha>=f) &&
+    (!to||!x.Fecha||x.Fecha<=to)
+  );
+  render();
+}
+
+function bar(el,map) {
+  const r=Object.entries(map).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]).slice(0,7),mx=r[0]?.[1]||1;
+  $(el).innerHTML=r.length?r.map(([n,v])=>`<div class="barrow"><span title="${esc(n)}">${esc(n)}</span><div class="track"><div class="fill" style="width:${Math.max(4,v/mx*100)}%"></div></div><span class="val">${Number(v).toFixed(2)} h</span></div>`).join(""):'<div class="empty">Sin datos.</div>';
+}
+
+function row(x,key=false) {
+  return `<tr data-id="${esc(x._sharePointItemId)}">
+  ${key?`<td>${esc(x.ClaveRegistro)}</td>`:""}
+  <td>${esc(x.NroBoletaSAP)}</td><td>${esc(x.Ficha)}</td><td>${esc(x.Trabajador)}</td><td>${fd(x.Fecha)}</td>
+  ${key?`<td>${esc(x.HoraInicio)}</td><td>${esc(x.HoraFin)}</td>`:`<td>${esc(x.HoraInicio)} - ${esc(x.HoraFin)}</td>`}
+  <td>${Number(x.Horas).toFixed(2)}</td><td>${esc(x.TipoMovimiento)}</td><td><span class="pill">${esc(stat(x.EstadoSAP))}</span></td></tr>`;
+}
+
+function render() {
+  $("kt").textContent=filtered.length;
+  $("kh").textContent=sum(filtered,x=>x.Horas).toFixed(2)+" h";
+  $("kw").textContent=new Set(filtered.map(x=>x.Ficha).filter(Boolean)).size;
+  $("kc").textContent=filtered.filter(x=>norm(x.TipoMovimiento).includes("comisión")).length;
+  $("km").textContent=filtered.filter(x=>norm(x.TipoMovimiento).includes("atención médica")).length;
+  $("kp").textContent=filtered.filter(x=>norm(x.TipoMovimiento).includes("permiso personal")).length;
+
+  let tm={}; filtered.forEach(x=>{const k=x.TipoMovimiento||"Sin tipo";tm[k]=(tm[k]||0)+x.Horas}); bar("typeBars",tm);
+  let wm={}; filtered.forEach(x=>{const k=x.Trabajador||"Sin trabajador";wm[k]=(wm[k]||0)+x.Horas}); bar("workerBars",wm);
+
+  let cnt={};filtered.forEach(x=>{const k=x.TipoMovimiento||"Sin tipo";cnt[k]=(cnt[k]||0)+1});
+  const e=Object.entries(cnt),tot=filtered.length,p=["#148299","#7caeb9","#bfd9de","#83939c","#b2bec3","#ccd6da"];
+  let st=0,stops=[];e.forEach(([_,v],i)=>{let en=st+v/Math.max(1,tot)*100;stops.push(`${p[i%p.length]} ${st}% ${en}%`);st=en});
+  $("donut").style.background=tot?`conic-gradient(${stops.join(",")})`:"#edf2f4";$("dt").textContent=tot;
+  $("legend").innerHTML=e.map(([n,v],i)=>`<div class="legendrow"><span class="dot" style="background:${p[i%p.length]}"></span><span>${esc(n)}</span><strong>${v}</strong></div>`).join("");
+
+  let sm={};filtered.forEach(x=>{const k=stat(x.EstadoSAP);sm[k]=(sm[k]||0)+1});
+  $("stateBox").innerHTML=Object.entries(sm).map(([n,v])=>`<div class="barrow"><span>${esc(n)}</span><div class="track"><div class="fill" style="width:${filtered.length?v/filtered.length*100:0}%"></div></div><span class="val">${v}</span></div>`).join("") || '<div class="empty">Sin datos.</div>';
+
+  const so=[...filtered].sort((a,b)=>(b.Fecha||"").localeCompare(a.Fecha||"")||(b.NroBoletaSAP||"").localeCompare(a.NroBoletaSAP||""));
+  $("recent").innerHTML=so.length?so.slice(0,8).map(x=>row(x,false)).join(""):'<tr><td colspan="8">Sin registros.</td></tr>';
+  $("all").innerHTML=so.length?so.map(x=>row(x,true)).join(""):'<tr><td colspan="10">Sin registros.</td></tr>';
+  $("count").textContent=`${so.length} registro${so.length===1?"":"s"}`;
+  bindRows(); people();
+}
+
+function people() {
+  const m=new Map;
+  filtered.forEach(x=>{
+    const key=x.Ficha||x.Trabajador;
+    if(!key)return;
+    if(!m.has(key))m.set(key,{Ficha:x.Ficha,Trabajador:x.Trabajador,rows:[]});
+    m.get(key).rows.push(x)
+  });
+  const gs=[...m.values()].sort((a,b)=>(a.Trabajador||"").localeCompare(b.Trabajador||"","es"));
+  if(!selected||!gs.some(g=>(g.Ficha||g.Trabajador)===selected))selected=(gs[0]?.Ficha||gs[0]?.Trabajador)||null;
+  $("plist").innerHTML=gs.length?gs.map(g=>`<button class="person ${(g.Ficha||g.Trabajador)===selected?"active":""}" data-f="${esc(g.Ficha||g.Trabajador)}"><strong>${esc(g.Trabajador||"Sin nombre")}</strong><span>Ficha ${esc(g.Ficha||"-")} · ${g.rows.length} movimientos</span></button>`).join(""):'<div class="empty">Sin trabajadores.</div>';
+  document.querySelectorAll(".person").forEach(b=>b.onclick=()=>{selected=b.dataset.f;people()});
+  const g=gs.find(x=>(x.Ficha||x.Trabajador)===selected);
+  if(!g){$("profile").className="empty";$("profile").innerHTML=DATA.length?"Sin datos con los filtros actuales.":"Inicie sesión y cargue los datos de SharePoint.";return}
+  const r=[...g.rows].sort((a,b)=>(b.Fecha||"").localeCompare(a.Fecha||""));
+  const ini=(g.Trabajador||"SP").split(" ").slice(0,2).map(x=>x[0]).join("");
+  $("profile").className="";
+  $("profile").innerHTML=`<div class="profilehead"><div class="avatar">${esc(ini)}</div><div><h2>${esc(g.Trabajador)}</h2><p>Ficha ${esc(g.Ficha||"-")}</p></div></div>
+  <div class="pkpis"><div class="pk"><strong>${r.length}</strong><span>Movimientos</span></div><div class="pk"><strong>${sum(r,x=>x.Horas).toFixed(2)} h</strong><span>Horas</span></div><div class="pk"><strong>${r.filter(x=>norm(x.TipoMovimiento).includes("comisión")).length}</strong><span>Comisiones</span></div><div class="pk"><strong>${r.filter(x=>norm(x.TipoMovimiento).includes("atención")||norm(x.TipoMovimiento).includes("permiso")).length}</strong><span>Atención / permisos</span></div></div>
+  <div class="scroll"><table><thead><tr><th>Fecha</th><th>Boleta</th><th>Tipo</th><th>Horario</th><th>Horas</th></tr></thead><tbody>${r.map(x=>`<tr data-id="${esc(x._sharePointItemId)}"><td>${fd(x.Fecha)}</td><td>${esc(x.NroBoletaSAP)}</td><td>${esc(x.TipoMovimiento)}</td><td>${esc(x.HoraInicio)} - ${esc(x.HoraFin)}</td><td>${Number(x.Horas).toFixed(2)}</td></tr>`).join("")}</tbody></table></div>`;
+  bindRows();
+}
+
+function bindRows() {
+  document.querySelectorAll("tr[data-id]").forEach(tr=>tr.onclick=()=>openD(DATA.find(x=>String(x._sharePointItemId)===String(tr.dataset.id))));
+}
+
+function openD(x) {
+  if(!x)return;
+  $("dtitle").textContent=x.ClaveRegistro||`Elemento ${x._sharePointItemId}`;
+  const a=[["N° Boleta SAP",x.NroBoletaSAP],["Ficha",x.Ficha],["Trabajador",x.Trabajador],["Fecha",fd(x.Fecha)],["Hora inicio",x.HoraInicio],["Hora fin",x.HoraFin],["Horas",Number(x.Horas).toFixed(2)],["Tipo movimiento",x.TipoMovimiento],["Estado SAP",stat(x.EstadoSAP)]];
+  $("dbody").innerHTML=a.map(([n,v])=>`<div class="drow"><span>${esc(n)}</span><strong>${esc(v)}</strong></div>`).join("");
+  $("drawer").classList.add("show");$("dbg").classList.add("show");
+}
+function closeD(){$("drawer").classList.remove("show");$("dbg").classList.remove("show")}
+
+$("nav").onclick=e=>{
+  const b=e.target.closest("button"); if(!b)return;
+  document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active");
+  document.querySelectorAll(".view").forEach(x=>x.classList.remove("active"));
+  $(b.dataset.view).classList.add("active");
+};
+["q","type","status","from","to"].forEach(id=>$(id).addEventListener(id==="q"?"input":"change",apply));
+$("clear").onclick=()=>{
+  $("q").value="";$("type").value="";$("status").value="";
+  const ds=DATA.map(x=>x.Fecha).filter(Boolean).sort();
+  $("from").value=ds[0]||"";$("to").value=ds.at(-1)||"";
+  filtered=[...DATA];render();
+};
+$("loginBtn").onclick=signIn;
+$("logoutBtn").onclick=signOut;
+$("refreshBtn").onclick=loadSharePointData;
+$("dx").onclick=closeD;$("dbg").onclick=closeD;
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeD()});
+
+const existing = await getAccount();
+if (existing) {
+  msalInstance.setActiveAccount(existing);
+  setConnected(existing);
+  await loadSharePointData();
+} else {
+  setConnected(null);
+  render();
+  setStatus("Inicie sesión con su cuenta institucional para cargar los datos reales de CONTROL_PERSONAL_ECCA.");
+}
+</script>
+</body>
+</html>
