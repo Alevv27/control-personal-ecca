@@ -160,7 +160,10 @@ const CONFIG = {
   listTitle: "CONTROL_PERSONAL_ECCA"
 };
 
-const redirectUri = window.location.protocol === "file:" ? "http://localhost" : window.location.origin;
+const redirectUri =
+  window.location.hostname === "alevv27.github.io"
+    ? "https://alevv27.github.io/control-personal-ecca/"
+    : (window.location.protocol === "file:" ? "http://localhost" : window.location.origin);
 
 const msalInstance = new PublicClientApplication({
   auth: {
